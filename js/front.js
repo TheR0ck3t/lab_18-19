@@ -1,20 +1,17 @@
 document.addEventListener("DOMContentLoaded", function () {
-
 modeForm = document.getElementById("modeForm");
+const savedData = document.getElementById("savedData");
 if (!modeForm) {
   console.error("modeForm element not found");
   return;
 }
 modeForm.addEventListener("change", async function (e) {
-
   switch (e.target.value) {
     case "forms": {
-      fetch("./api/list?type=forms")
+      fetch(`./api/list?type=${e.target.value}`)
       .then((response) => response.json())
       .then((data) => {
-        const savedData = document.getElementById("savedData");
         data = Array.isArray(data) && Array.isArray(data[0]) ? data[0] : data;
-
         const table = data.map((data) => {
             return `<tr>
               <td>${data.id || "Brak ID"}</td>
@@ -24,30 +21,20 @@ modeForm.addEventListener("change", async function (e) {
               <td><button value="${data.id}">Wczytaj</button></td
               </tr>`;
         }).join("");
-        savedData.innerHTML = `
-            <table id="formsTable">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nazwa</th>
-                <th>Pola</th>
-                <th>Utworzono</th>
-                <th>Akcje</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${table}
-            </tbody>
-            </table>`;
-            loadData(e.target.value);})
-
+        loadTable(table, `${e.target.value}Table`)
+        .then(() => {
+          loadData(e.target.value);
+        })
+        .catch((error) => {
+            console.error("Błąd podczas ładowania modułu table.js:", error);
+        });
+      });
       break;
     };
     case "templates": {
-      fetch("./api/list?type=templates")
+      fetch(`./api/list?type=${e.target.value}`)
       .then((response) => response.json())
       .then((data) => {
-        const savedData = document.getElementById("savedData");
         data = Array.isArray(data) && Array.isArray(data[0]) ? data[0] : data;
         const table = data.map((data) => {
             return `<tr>
@@ -58,32 +45,34 @@ modeForm.addEventListener("change", async function (e) {
               <td><button value="${data.id}">Wczytaj</button></td
               </tr>`;
         }).join("");
-        savedData.innerHTML = `
-            <table id="templatesTable">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nazwa</th>
-                <th>Pola</th>
-                <th>Utworzono</th>
-                <th>Akcje</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${table}
-            </tbody>
-            </table>`;
-            loadData(e.target.value);
-    })
+        loadTable(table, `${e.target.value}Table`)
+        .then(() => {
+          loadData(e.target.value);
+        })
+        .catch((error) => {
+            console.error("Błąd podczas ładowania modułu table.js:", error);
+        });
+      })
       break;
     };
+  }});
+        
+        
+async function loadTable(table, tableID) {
+  try {
+    const module = await import("./table.js");
+    const getTable = module.default;
+    savedData.innerHTML = getTable(table, tableID);
+  } catch (error) {
+    console.error("Błąd podczas wczytywania tabeli:", error);
+    
   }
+}
 
-})
 async function loadData(type) {
   const table = document.getElementById(`${type}Table`);
   if (!table) {
-    console.error(`${type}Table element not found`);
+    console.error(`${type} Table element not found`);
     return;
   }
   const buttons = table.querySelectorAll("button");
@@ -105,5 +94,4 @@ async function loadData(type) {
       })
     })
   })
-}
-})
+  }})
