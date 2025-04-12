@@ -1,0 +1,45 @@
+<!DOCTYPE forms>
+<forms lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kreator formularzy</title>
+  <link rel="stylesheet" href="./css/front.css" />
+</head>
+<body>
+  <h1>Kreator szablonów i formularzy</h1>
+    <form id ="modeForm">
+      <input type="radio" id="forms" name="mode" value="forms">
+      <label for="forms">Formularze</label><br>
+      <input type="radio" id="templates" name="mode" value="templates">
+      <label for="templates">Szablony</label><br>
+    </form>
+
+  <div class="form-controls">
+    <label for="formName">Nazwa formularza:</label>
+    <input id="formName" placeholder="Testowy Formularz" />
+    <button>Dodaj pole</button>
+    <button>Zapisz</button>
+  </div>
+  <div class="template">
+    <label for="templateName">Nazwa szablonu:</label>
+    <input id="templateName" placeholder="Testowy szablon">
+    <br>
+    <label for="templateContent">Zawartośc szablonu:</label>
+    <textarea name="templateContent" id="templateContent" cols="100" rows="20"></textarea>
+  </div>
+
+  <div id="template-select-wrapper" style="display:none;">
+    <label>Wybierz szablon:
+      <select id="template-select"></select>
+    </label>
+  </div>
+
+  <form id="form-builder"></form>
+
+
+  <div id="savedData">
+  </div>
+
+  <script src="./js/front.js"></script>
+</body>
+</forms>
