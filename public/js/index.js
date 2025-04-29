@@ -18,13 +18,10 @@ modeForm.addEventListener("change", async function (e) {
               <td>${data.form_name || "<i>Brak nazwy</i>"}</td>
               <td>${data.data || "Brak danych"}</td>
               <td>${data.created_at || "Brak daty"}</td>
-              <td><button value="${data.id}">Wczytaj</button></td
+              <td><a href="./editor?type=${e.target.value}&id=${data.id}"><button value="${data.id}">Wczytaj</button></a></td
               </tr>`;
         }).join("");
         loadTable(table, `${e.target.value}Table`)
-        .then(() => {
-          loadData(e.target.value);
-        })
         .catch((error) => {
             console.error("Błąd podczas ładowania modułu table.js:", error);
         });
@@ -42,13 +39,10 @@ modeForm.addEventListener("change", async function (e) {
               <td>${data.template_name || "<i>Brak nazwy</i>"}</td>
               <td>${data.data || "Brak danych"}</td>
               <td>${data.created_at || "Brak daty"}</td>
-              <td><button value="${data.id}">Wczytaj</button></td
+              <td><a href="./editor?type=${e.target.value}&id=${data.id}"><button value="${data.id}">Wczytaj</button></a></td
               </tr>`;
         }).join("");
         loadTable(table, `${e.target.value}Table`)
-        .then(() => {
-          loadData(e.target.value);
-        })
         .catch((error) => {
             console.error("Błąd podczas ładowania modułu table.js:", error);
         });
@@ -68,30 +62,4 @@ async function loadTable(table, tableID) {
     
   }
 }
-
-async function loadData(type) {
-  const table = document.getElementById(`${type}Table`);
-  if (!table) {
-    console.error(`${type} Table element not found`);
-    return;
-  }
-  const buttons = table.querySelectorAll("button");
-  if (!buttons) {
-    console.error("No buttons found in the table");
-    return;
-  }
-  buttons.forEach((button) => {
-    button.addEventListener("click", async (e) => {
-      fetch(`./api/load?type=${type}&id=${e.target.value}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log(data);
-      })
-    })
-  })
-  }})
+})

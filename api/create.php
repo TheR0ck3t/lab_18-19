@@ -34,12 +34,12 @@ try {
     if (!$fileName || !$data) throw new Exception("Brakuje danych");
     
     switch ($type) {
-        case 'template' : 
+        case 'templates' : 
             $stmt = $pdo->prepare("INSERT INTO templates (template_name, data) VALUES (?, ?)");
             $stmt->execute([$fileName, json_encode($data)]);
             echo json_encode(['message' => 'Szablon zapisany']);
             break;
-        case 'form' :
+        case 'forms' :
             $stmt = $pdo->prepare("INSERT INTO forms (form_name, data) VALUES (?, ?)");
             $stmt->execute([$fileName, json_encode($data)]);
             echo json_encode(['message' => 'Formularz zapisany']);
