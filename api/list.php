@@ -14,7 +14,7 @@ if (!$type) {
     echo json_encode(['error' => 'Brak typu']);
     exit;
 }
-if (!in_array($type, ['templates', 'forms'])) {
+if (!in_array($type, ['templates', 'forms', 'fields'])) {
     http_response_code(400);
     echo json_encode(['error' => 'Nieznany typ']);
     exit;
@@ -45,6 +45,18 @@ try {
             else {
                 header('Content-type: application/json');
                 echo json_encode([$forms]);
+                break;
+            }
+        case 'fields':
+            $fields = $pdo->query("SELECT id, field_name FROM fields")->fetchAll(PDO::FETCH_ASSOC);
+            if (!$fields) {
+                http_response_code(404);
+                echo json_encode(['error' => 'Nie znaleziono pól']);
+                break;
+            }
+            else {
+                header('Content-type: application/json');
+                echo json_encode([$fields]);
                 break;
             }
         default:

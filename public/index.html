@@ -10,26 +10,15 @@
   <h1>Kreator szablonów i formularzy</h1>
     <form id ="modeForm">
       <input type="radio" id="forms" name="mode" value="forms">
-      <label for="forms">Formularze</label><br>
+      <label for="forms">Formularze</label>
       <input type="radio" id="templates" name="mode" value="templates">
-      <label for="templates">Szablony</label><br>
+      <label for="templates">Szablony</label>
+      <input type="radio" name="mode" id="fields" value="fields">
+      <label for="fields">Pola</label>
     </form>
-
-<div class="controls">
-  
 </div>
-
-  <div id="template-select-wrapper" style="display:none;">
-    <label>Wybierz szablon:
-      <select id="template-select"></select>
-    </label>
-  </div>
-
-  <form id="form-builder"></form>
-
-
-  <div id="savedData">
-  </div>
+<div id="savedData">
+</div>
 
   <script src="./js/index.js"></script>
 </body>

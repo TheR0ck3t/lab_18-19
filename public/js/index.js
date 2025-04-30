@@ -18,10 +18,10 @@ modeForm.addEventListener("change", async function (e) {
               <td>${data.form_name || "<i>Brak nazwy</i>"}</td>
               <td>${data.data || "Brak danych"}</td>
               <td>${data.created_at || "Brak daty"}</td>
-              <td><a href="./editor?type=${e.target.value}&id=${data.id}"><button value="${data.id}">Wczytaj</button></a></td
+              <td><a href="./editor?type=${e.target.value}&mode=edit&id=${data.id}"><button value="${data.id}">Wczytaj</button></a></td
               </tr>`;
         }).join("");
-        loadTable(table, `${e.target.value}Table`)
+        loadTable(e.target.value, table, `${e.target.value}Table`)
         .catch((error) => {
             console.error("Błąd podczas ładowania modułu table.js:", error);
         });
@@ -39,24 +39,44 @@ modeForm.addEventListener("change", async function (e) {
               <td>${data.template_name || "<i>Brak nazwy</i>"}</td>
               <td>${data.data || "Brak danych"}</td>
               <td>${data.created_at || "Brak daty"}</td>
-              <td><a href="./editor?type=${e.target.value}&id=${data.id}"><button value="${data.id}">Wczytaj</button></a></td
+              <td><a href="./editor?type=${e.target.value}&mode=edit&id=${data.id}"><button value="${data.id}">Wczytaj</button></a></td
               </tr>`;
         }).join("");
-        loadTable(table, `${e.target.value}Table`)
+        loadTable(e.target.value, table, `${e.target.value}Table`)
         .catch((error) => {
             console.error("Błąd podczas ładowania modułu table.js:", error);
         });
       })
       break;
     };
+    case "fields" : {
+      fetch(`./api/list?type=${e.target.value}`)
+      .then((response) => response.json())
+      .then((data) => {
+        data = Array.isArray(data) && Array.isArray(data[0]) ? data[0] : data;
+        const table = data.map((data) => {
+            return `<tr>
+              <td>${data.id || "Brak ID"}</td>
+              <td>${data.field_name || "<i>Brak nazwy</i>"}</td>
+              <td><a href="./editor?type=${e.target.value}&mode=edit&id=${data.id}"><button value="${data.id}">Edytuj</button></a><button value ${data.id}>Usuń</button></td
+              </tr>`;
+        }).join("");
+        console.log (e.target.value)
+        loadTable(e.target.value, table, `${e.target.value}Table`)
+        .catch((error) => {
+            console.error("Błąd podczas ładowania modułu table.js:", error);
+        });
+      })
+      break;
+    }
   }});
         
         
-async function loadTable(table, tableID) {
+async function loadTable(type, table, tableID) {
   try {
-    const module = await import("./table.js");
+    const module = await import("./partials/table.js");
     const getTable = module.default;
-    savedData.innerHTML = getTable(table, tableID);
+    savedData.innerHTML = getTable(type,table, tableID);
   } catch (error) {
     console.error("Błąd podczas wczytywania tabeli:", error);
     
