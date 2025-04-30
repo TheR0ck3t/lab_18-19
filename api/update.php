@@ -12,20 +12,29 @@ if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
     echo json_encode(['error' => 'Nieprawidłowa metoda']);
     exit;
 }
+
 if (!isset($_SERVER['CONTENT_TYPE']) || strpos($_SERVER['CONTENT_TYPE'], 'application/json') === false) {
     http_response_code(400);
     echo json_encode(['error' => 'Nieprawidłowy typ treści']);
     exit;
 }
+
 $type = $_GET['type'] ?? null;
 if (!$type) {
     http_response_code(400);
     echo json_encode(['error' => 'Brak typu']);
     exit;
 }
-if (!$id = $_GET['id'] ?? null) {
+if (!in_array($type, ['templates', 'forms', 'fields'])) {
     http_response_code(400);
-    echo json_encode(['error' => 'Brak id']);
+    echo json_encode(['error' => 'Nieznany typ']);
+    exit;
+}
+
+$id = $_GET['id'] ?? null;
+if (!$id) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Brak ID']);
     exit;
 }
 
@@ -58,7 +67,15 @@ try {
             }
             echo json_encode(['message' => 'Formularz zaktualizowany']);
             break;
-        default:
+        case 'fields' :
+            if (!$data) throw new Exception("Brakuje nazwy pola");
+            $stmt = $pdo->prepare("UPDATE fields SET field_name = ? WHERE id = ?");
+            if (!$stmt->execute([$data, $id])) {
+                throw new Exception("Błąd SQL: " . implode(", ", $stmt->errorInfo()));
+            }
+            echo json_encode(['message' => 'Pole zaktualizowane']);
+            break;
+            default:
             http_response_code(400);
             echo json_encode(['error' => 'Nieznany typ']);
             exit;

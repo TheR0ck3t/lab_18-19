@@ -6,7 +6,7 @@ export default function getTable(type, table, tableID) {
                   <tr>
                     <th>ID</th>
                     <th>Nazwa</th>
-                    <th>Dane</th>
+                    <th>Treść</th>
                     <th>Utworzono</th>
                     <th>Akcje</th>
                   </tr>

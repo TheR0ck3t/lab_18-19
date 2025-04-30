@@ -21,7 +21,6 @@ if (!in_array($type, ['templates', 'forms', 'fields'])) {
 }
 
 try {
-
     switch ($type) {
         case 'templates':
             $templates = $pdo->query("SELECT id, template_name ,data ,created_at FROM templates")->fetchAll(PDO::FETCH_ASSOC);

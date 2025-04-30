@@ -1,5 +1,5 @@
-<!DOCTYPE forms>
-<forms lang="pl">
+<!DOCTYPE html>
+<html lang="pl">
 <head>
   <meta charset="UTF-8" />
   <title>Kreator formularzy</title>
@@ -8,18 +8,15 @@
 </head>
 <body>
   <h1>Kreator szablonów i formularzy</h1>
-    <form id ="modeForm">
-      <input type="radio" id="forms" name="mode" value="forms">
-      <label for="forms">Formularze</label>
-      <input type="radio" id="templates" name="mode" value="templates">
-      <label for="templates">Szablony</label>
-      <input type="radio" name="mode" id="fields" value="fields">
-      <label for="fields">Pola</label>
-    </form>
-</div>
-<div id="savedData">
-</div>
+  <form id="modeForm">
+    <button type="button" value="forms">Formularze</button>
+    <button type="button" value="templates">Szablony</button>
+    <button type="button" value="fields">Pola</button>
+  </form>
+  <div id="savedData">
+    <p>Wybierz typ z listy, aby zobaczyć dane.</p>
+  </div>
 
   <script src="./js/index.js"></script>
 </body>
-</forms>
+</html>

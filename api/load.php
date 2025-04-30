@@ -15,6 +15,11 @@ if (!$type) {
     echo json_encode(['error' => 'Brak typu']);
     exit;
 }
+if (!in_array($type, ['templates', 'forms', 'fields'])) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Nieznany typ']);
+    exit;
+}
 $id = $_GET['id'] ?? null;
 
 if (!$id) {
@@ -53,6 +58,21 @@ try {
             else {
                 header('Content-type: application/json');
                 echo json_encode($form);
+                break;
+            }
+        case 'fields':
+            $stmt = $pdo->prepare("SELECT id, field_name FROM fields WHERE id = :id");
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+            $field = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$field) {
+                http_response_code(404);
+                echo json_encode(['error' => 'Nie znaleziono pola']);
+                break;
+            }
+            else {
+                header('Content-type: application/json');
+                echo json_encode($field);
                 break;
             }
         default:
