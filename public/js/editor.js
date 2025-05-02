@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       document.getElementById("editor").textContent = "Nie podano typu.";
       return;
     }
-    if (type !== "forms" && type !== "templates") {
+    if (type !== "forms" && type !== "templates" && type !== "fields") {
       document.getElementById("editor").textContent = "Nieprawidłowy typ.";
       return;
     }

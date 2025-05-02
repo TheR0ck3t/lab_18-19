@@ -7,3 +7,18 @@ textarea {
     box-sizing: border-box;
     
 }
+
+#fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+#fields input {
+    flex: 1;
+}
+
+#fields button {
+    white-space: nowrap;
+}

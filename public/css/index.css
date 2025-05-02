@@ -13,7 +13,11 @@
     text-align: center;
   }
 
-  
+#savedData {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
 th, td {
   padding: 0.5rem;
   border: 1px solid #ccc;
@@ -28,4 +32,35 @@ td:last-child {
 .selected {
   background: #b0bec5;
   color: #000000
+}
+
+#modeForm {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+/* #createButton {
+  display: block;
+  margin: 1vh auto 0 auto;
+  padding: 0.5rem 1rem;
+} */
+ #createButton {
+  display: block;
+  /* margin: 1.5rem auto 0 auto; 
+  padding: 0.5rem 1rem; */
+  max-width: 200px;
+}
+
+#container > h1 {
+  height: 5vh;
+}
+#container > #modeForm {
+  height: 5vh;
+}
+#container > #main > #createButton {
+  height: auto;
+  margin-top: calc((5vh - 2.5em) / 2);
+  margin-bottom: calc((5vh - 2.5em) / 2);
+  margin-left: auto;
+  margin-right: auto;
 }

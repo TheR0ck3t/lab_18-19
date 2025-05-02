@@ -5,6 +5,10 @@ document.addEventListener("DOMContentLoaded", function () {
     console.error("modeForm element not found");
     return;
   }
+  if (!main) {
+    console.error("main element not found");
+    return;
+  }
 
   modeForm.addEventListener("click", async function (e) {
     if (!e.target.matches("button")) return; // Ignoruj kliknięcia poza przyciskami
@@ -18,73 +22,64 @@ document.addEventListener("DOMContentLoaded", function () {
 
     switch (mode) {
       case "forms": {
-        fetch(`./api/list?type=${mode}`)
-          .then((response) => response.json())
-          .then((data) => {
-            data = Array.isArray(data) && Array.isArray(data[0]) ? data[0] : data;
-            const table = data.map((data) => {
-              return `<tr>
+        const response = await fetch(`./api/list?type=${mode}`);
+        if (!response.ok) {
+          throw new Error("Nie udało się pobrać danych.");
+        }
+        let data = await response.json();
+        data = Array.isArray(data) && Array.isArray(data[0]) ? data[0] : data;
+        const table = data.map((data) => {
+          return `<tr>
                 <td>${data.id || "Brak ID"}</td>
                 <td>${data.form_name || "<i>Brak nazwy</i>"}</td>
                 <td>${data.data || "Brak danych"}</td>
                 <td>${data.created_at || "Brak daty"}</td>
                 <td><a href="./editor?type=${mode}&mode=edit&id=${data.id}"><button value="${data.id}">Edytuj</button></a><button type="button" class="deleteButton" value="${data.id}">Usuń</button></td>
               </tr>`;
-            }).join("");
-            loadTable(mode, table, `${mode}Table`)
-              .then(() => {
-                deleteData(mode);
-              })
-              .catch((error) => {
-                console.error("Błąd podczas ładowania modułu table.js:", error);
-              });
-          });
+        }).join("");
+        await loadTable(mode, table, `${mode}Table`);
+        addCreateButton(mode);
+        deleteData(mode);
         break;
       }
       case "templates": {
-        fetch(`./api/list?type=${mode}`)
-          .then((response) => response.json())
-          .then((data) => {
-            data = Array.isArray(data) && Array.isArray(data[0]) ? data[0] : data;
-            const table = data.map((data) => {
-              return `<tr>
+        const response = await fetch(`./api/list?type=${mode}`);
+        if (!response.ok) {
+          throw new Error("Nie udało się pobrać danych.");
+        }
+        let data = await response.json();
+        data = Array.isArray(data) && Array.isArray(data[0]) ? data[0] : data;
+        const table = data.map((data) => {
+          return `<tr>
                 <td>${data.id || "Brak ID"}</td>
                 <td>${data.template_name || "<i>Brak nazwy</i>"}</td>
                 <td>${data.data || "Brak danych"}</td>
                 <td>${data.created_at || "Brak daty"}</td>
                 <td><a href="./editor?type=${mode}&mode=edit&id=${data.id}"><button value="${data.id}">Edytuj</button></a><button type="button" class="deleteButton" value="${data.id}">Usuń</button></td>
               </tr>`;
-            }).join("");
-            loadTable(mode, table, `${mode}Table`)
-              .then(() => {
-                deleteData(mode);
-              })
-              .catch((error) => {
-                console.error("Błąd podczas ładowania modułu table.js:", error);
-              });
-          });
+        }).join("");
+        await loadTable(mode, table, `${mode}Table`);
+        addCreateButton(mode);
+        deleteData(mode);
         break;
       }
       case "fields": {
-        fetch(`./api/list?type=${mode}`)
-          .then((response) => response.json())
-          .then((data) => {
-            data = Array.isArray(data) && Array.isArray(data[0]) ? data[0] : data;
-            const table = data.map((data) => {
-              return `<tr>
+        const response = await fetch(`./api/list?type=${mode}`);
+        if (!response.ok) {
+          throw new Error("Nie udało się pobrać danych.");
+        }
+        let data = await response.json();
+        data = Array.isArray(data) && Array.isArray(data[0]) ? data[0] : data;
+        const table = data.map((data) => {
+          return `<tr>
                 <td>${data.id || "Brak ID"}</td>
                 <td>${data.field_name || "<i>Brak nazwy</i>"}</td>
                 <td><a href="./editor?type=${mode}&mode=edit&id=${data.id}"><button value="${data.id}">Edytuj</button></a><button type="button" class="deleteButton" value="${data.id}">Usuń</button></td>
               </tr>`;
-            }).join("");
-            loadTable(mode, table, `${mode}Table`)
-              .then(() => {
-                deleteData(mode);
-              })
-              .catch((error) => {
-                console.error("Błąd podczas ładowania modułu table.js:", error);
-              });
-          });
+        }).join("");
+        await loadTable(mode, table, `${mode}Table`);
+        addCreateButton(mode);
+        deleteData(mode);
         break;
       }
     }
@@ -98,6 +93,20 @@ document.addEventListener("DOMContentLoaded", function () {
     } catch (error) {
       console.error("Błąd podczas wczytywania tabeli:", error);
     }
+  }
+
+  function addCreateButton(type) {
+    const oldButton = document.getElementById("createButton");
+    if (oldButton) {
+      oldButton.remove();
+    }
+    const createButton = document.createElement("button");
+    createButton.id = "createButton";
+    createButton.textContent = "Dodaj nowy";
+    createButton.addEventListener("click", function () {
+      window.location.href = `./editor?type=${type}&mode=new`;
+    });
+    savedData.insertAdjacentElement("afterend",createButton);
   }
 
   async function deleteData(type) {

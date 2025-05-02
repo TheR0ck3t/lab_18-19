@@ -45,6 +45,7 @@ try {
     $data = $json['data'] ?? null;
     $form_name = $json['form_name'] ?? null;
     $template_name = $json['template_name'] ?? null;
+    $field_name = $json['field_name'] ?? null;
 
     if (!$data) throw new Exception("Brakuje danych");
 
@@ -68,9 +69,9 @@ try {
             echo json_encode(['message' => 'Formularz zaktualizowany']);
             break;
         case 'fields' :
-            if (!$data) throw new Exception("Brakuje nazwy pola");
+            if (!$field_name) throw new Exception("Brakuje nazwy pola");
             $stmt = $pdo->prepare("UPDATE fields SET field_name = ? WHERE id = ?");
-            if (!$stmt->execute([$data, $id])) {
+            if (!$stmt->execute([$field_name, $id])) {
                 throw new Exception("Błąd SQL: " . implode(", ", $stmt->errorInfo()));
             }
             echo json_encode(['message' => 'Pole zaktualizowane']);

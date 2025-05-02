@@ -28,27 +28,45 @@ try {
     $json = json_decode(file_get_contents("php://input"), true);
     if (!$json) throw new Exception("Błąd dekodowania JSON");
 
-    $fileName = trim($json['fileName'] ?? '');
     $data = $json['data'] ?? null;
+    $form_name = $json['form_name'] ?? null;
+    $template_name = $json['template_name'] ?? null;
+    $field_name = $json['field_name'] ?? null;
 
-    if (!$fileName || !$data) throw new Exception("Brakuje danych");
-    
     switch ($type) {
-        case 'templates' : 
+        case 'templates':
+            if (!$template_name || !$data) throw new Exception("Brakuje danych szablonu");
             $stmt = $pdo->prepare("INSERT INTO templates (template_name, data) VALUES (?, ?)");
-            $stmt->execute([$fileName, json_encode($data)]);
+            $dataToSave = is_string($data) ? $data : json_encode($data);
+            if (!$stmt->execute([$template_name, $dataToSave])) {
+                throw new Exception("Błąd SQL: " . implode(", ", $stmt->errorInfo()));
+            }
             echo json_encode(['message' => 'Szablon zapisany']);
             break;
-        case 'forms' :
+        case 'forms':
+            if (!$form_name || !$data) throw new Exception("Brakuje danych formularza");
             $stmt = $pdo->prepare("INSERT INTO forms (form_name, data) VALUES (?, ?)");
-            $stmt->execute([$fileName, json_encode($data)]);
+            $dataToSave = is_string($data) ? $data : json_encode($data);
+            if (!$stmt->execute([$form_name, $dataToSave])) {
+                throw new Exception("Błąd SQL: " . implode(", ", $stmt->errorInfo()));
+            }
             echo json_encode(['message' => 'Formularz zapisany']);
+            break;
+        case 'fields':
+            if (!$field_name || !is_array($field_name)) throw new Exception("Brak pól");
+            $stmt = $pdo->prepare("INSERT INTO fields (field_name) VALUES (?)");
+            foreach ($field_name as $field) {
+                if (!$stmt->execute([$field])) {
+                    throw new Exception("Błąd SQL: " . implode(", ", $stmt->errorInfo()));
+                }
+            }
+            echo json_encode(['message' => 'Pola zapisane']);
             break;
         default:
             http_response_code(400);
             echo json_encode(['error' => 'Nieznany typ']);
             exit;
-    };
+    }
 
 } catch (Exception $e) {
     http_response_code(500);
