@@ -47,11 +47,10 @@ try {
     $template_name = $json['template_name'] ?? null;
     $field_name = $json['field_name'] ?? null;
 
-    if (!$data) throw new Exception("Brakuje danych");
 
     switch ($type) {
         case 'templates' : 
-            if (!$template_name) throw new Exception("Brakuje nazwy szablonu");
+            if (!$template_name || !$data) throw new Exception("Brakuje danych szablonu");
             $stmt = $pdo->prepare("UPDATE templates SET data = ?, template_name = ? WHERE id = ?");
             $dataToSave = is_string($data) ? $data : json_encode($data);
             if (!$stmt->execute([$dataToSave, $template_name, $id])) {
@@ -60,7 +59,7 @@ try {
             echo json_encode(['message' => 'Szablon zaktualizowany']);
             break;
         case 'forms' :
-            if (!$form_name) throw new Exception("Brakuje nazwy formularza");
+            if (!$form_name || !$data) throw new Exception("Brakuje danych formularza");
             $stmt = $pdo->prepare("UPDATE forms SET data = ?, form_name = ? WHERE id = ?");
             $dataToSave = is_string($data) ? $data : json_encode($data);
             if (!$stmt->execute([$dataToSave, $form_name, $id])) {

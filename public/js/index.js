@@ -102,7 +102,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     const createButton = document.createElement("button");
     createButton.id = "createButton";
-    createButton.textContent = "Dodaj nowy";
+    if (type === "fields") {
+      createButton.textContent = "Dodaj nowe pole";
+    }
+    else if (type === "forms") {
+      createButton.textContent = "Dodaj nowy formularz";
+    }
+    else if (type === "templates") {
+      createButton.textContent = "Dodaj nowy szablon";
+    }
     createButton.addEventListener("click", function () {
       window.location.href = `./editor?type=${type}&mode=new`;
     });
