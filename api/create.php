@@ -32,12 +32,12 @@ try {
     $form_name = $json['form_name'] ?? null;
     $template_name = $json['template_name'] ?? null;
     $field_name = $json['field_name'] ?? null;
+    $dataToSave = is_string($data) ? $data : json_encode($data, JSON_UNESCAPED_UNICODE);
 
     switch ($type) {
         case 'templates':
             if (!$template_name || !$data) throw new Exception("Brakuje danych szablonu");
             $stmt = $pdo->prepare("INSERT INTO templates (template_name, data) VALUES (?, ?)");
-            $dataToSave = is_string($data) ? $data : json_encode($data);
             if (!$stmt->execute([$template_name, $dataToSave])) {
                 throw new Exception("Błąd SQL: " . implode(", ", $stmt->errorInfo()));
             }
@@ -46,7 +46,6 @@ try {
         case 'forms':
             if (!$form_name || !$data) throw new Exception("Brakuje danych formularza");
             $stmt = $pdo->prepare("INSERT INTO forms (form_name, data) VALUES (?, ?)");
-            $dataToSave = is_string($data) ? $data : json_encode($data);
             if (!$stmt->execute([$form_name, $dataToSave])) {
                 throw new Exception("Błąd SQL: " . implode(", ", $stmt->errorInfo()));
             }

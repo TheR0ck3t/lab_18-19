@@ -24,18 +24,34 @@ document.addEventListener("DOMContentLoaded", function () {
       case "forms": {
         const response = await fetch(`./api/list?type=${mode}`);
         if (!response.ok) {
-          throw new Error("Nie udało się pobrać danych.");
+          //throw new Error("Nie udało się pobrać danych.");
+          savedData.innerHTML = `<p>Nie udało się pobrać danych bądź ich brak. Dodaj nowe</p><br>${addCreateButton(mode)}`;
         }
         let data = await response.json();
         data = Array.isArray(data) && Array.isArray(data[0]) ? data[0] : data;
         const table = data.map((data) => {
+          // Formatowanie danych dla formularzy - konwersja tablicy pól na czytelny tekst
+          let displayData = data.data;
+          if (typeof displayData === 'string' && displayData.startsWith('[')) {
+            try {
+              // Próba parsowania JSON w przypadku tablicy pól
+              const fieldsArray = JSON.parse(displayData);
+              if (Array.isArray(fieldsArray)) {
+                displayData = fieldsArray.join(', ');
+              }
+            } catch (e) {
+              // Jeśli parsowanie się nie powiedzie, zachowaj oryginalną wartość
+              console.log("Nie udało się sparsować danych:", e);
+            }
+          }
+          
           return `<tr>
-                <td>${data.id || "Brak ID"}</td>
-                <td>${data.form_name || "<i>Brak nazwy</i>"}</td>
-                <td>${data.data || "Brak danych"}</td>
-                <td>${data.created_at || "Brak daty"}</td>
-                <td><a href="./editor?type=${mode}&mode=edit&id=${data.id}"><button value="${data.id}">Edytuj</button></a><button type="button" class="deleteButton" value="${data.id}">Usuń</button></td>
-              </tr>`;
+                    <td>${data.id || "Brak ID"}</td>
+                    <td>${data.form_name || "<i>Brak nazwy</i>"}</td>
+                    <td class="limited-cell">${limitText(displayData || "Brak danych", 50)}</td>
+                    <td>${data.created_at || "Brak daty"}</td>
+                    <td><a href="./editor?type=${mode}&mode=edit&id=${data.id}"><button value="${data.id}">Edytuj</button></a><button type="button" class="deleteButton" value="${data.id}">Usuń</button></td>
+                  </tr>`;
         }).join("");
         await loadTable(mode, table, `${mode}Table`);
         addCreateButton(mode);
@@ -51,12 +67,12 @@ document.addEventListener("DOMContentLoaded", function () {
         data = Array.isArray(data) && Array.isArray(data[0]) ? data[0] : data;
         const table = data.map((data) => {
           return `<tr>
-                <td>${data.id || "Brak ID"}</td>
-                <td>${data.template_name || "<i>Brak nazwy</i>"}</td>
-                <td>${data.data || "Brak danych"}</td>
-                <td>${data.created_at || "Brak daty"}</td>
-                <td><a href="./editor?type=${mode}&mode=edit&id=${data.id}"><button value="${data.id}">Edytuj</button></a><button type="button" class="deleteButton" value="${data.id}">Usuń</button></td>
-              </tr>`;
+                    <td>${data.id || "Brak ID"}</td>
+                    <td>${data.template_name || "<i>Brak nazwy</i>"}</td>
+                    <td class="limited-cell">${limitText(data.data || "Brak danych", 75)}</td>
+                    <td>${data.created_at || "Brak daty"}</td>
+                    <td><a href="./editor?type=${mode}&mode=edit&id=${data.id}"><button value="${data.id}">Edytuj</button></a><button type="button" class="deleteButton" value="${data.id}">Usuń</button></td>
+                  </tr>`;
         }).join("");
         await loadTable(mode, table, `${mode}Table`);
         addCreateButton(mode);
@@ -84,6 +100,12 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
   });
+
+
+
+  savedData.innerHTML = `<p>Wybierz typ z listy, aby zobaczyć dane.</p>`;
+
+
 
   async function loadTable(type, table, tableID) {
     try {
@@ -163,5 +185,14 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
   }
-  savedData.innerHTML = `<p>Wybierz typ z listy, aby zobaczyć dane.</p>`;
+
+
+  function limitText(text, maxLength = 75) {
+    if (text && text.length > maxLength) {
+      return `<span class="limited-text" title="${text.replace(/"/g, '&quot;')}">${text.substring(0, maxLength)}...</span>`;
+    }
+    return text;
+  }
+  
+
 });
