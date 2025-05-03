@@ -1,27 +1,32 @@
 <?php
+// Wczytanie konfiguracji i połączenia z bazą danych
 $config = require '../config.php';
 require '../db/db.php';
 
-
+// Sprawdzenie czy metoda HTTP to GET
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);
     echo json_encode(['error' => 'Nieprawidłowa metoda']);
     exit;
 }
 
+// Pobranie typu zasobu z parametrów URL
 $type = $_GET['type'] ?? null;
 if (!$type) {
     http_response_code(400);
     echo json_encode(['error' => 'Brak typu']);
     exit;
 }
+
+// Sprawdzenie czy typ jest prawidłowy
 if (!in_array($type, ['templates', 'forms', 'fields'])) {
     http_response_code(400);
     echo json_encode(['error' => 'Nieznany typ']);
     exit;
 }
-$id = $_GET['id'] ?? null;
 
+// Pobranie identyfikatora zasobu
+$id = $_GET['id'] ?? null;
 if (!$id) {
     http_response_code(400);
     echo json_encode(['error' => 'Brak ID']);
@@ -31,6 +36,7 @@ if (!$id) {
 try {
     switch ($type) {
         case 'templates':
+            // Pobieranie konkretnego szablonu według ID
             $stmt = $pdo->prepare("SELECT id, template_name, data, created_at FROM templates WHERE id = :id");
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
@@ -46,6 +52,7 @@ try {
                 break;
             }
         case 'forms':
+            // Pobieranie konkretnego formularza według ID
             $stmt = $pdo->prepare("SELECT id, form_name, data, created_at FROM forms WHERE id = :id");
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
@@ -61,6 +68,7 @@ try {
                 break;
             }
         case 'fields':
+            // Pobieranie konkretnego pola według ID
             $stmt = $pdo->prepare("SELECT id, field_name FROM fields WHERE id = :id");
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $stmt->execute();
@@ -76,12 +84,14 @@ try {
                 break;
             }
         default:
+            // Nieznany typ zasobu
             http_response_code(400);
             echo json_encode(['error' => 'Nieznany typ']);
             exit;
     }
 
 } catch (Exception $e) {
+    // Obsługa błędów
     http_response_code(500);
     echo json_encode(['error' => $e->getMessage()]);
 }

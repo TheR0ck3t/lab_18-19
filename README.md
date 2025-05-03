@@ -172,8 +172,8 @@ php -S 0.0.0.0:8000 -t /
 # Sposób 2: Konfiguracja dedykowanego wirtualnego hosta w Apache
 <VirtualHost *:80>
     ServerName lab_18-19.local
-    DocumentRoot /ścieżka/do/projektu/
-    <Directory /ścieżka/do/projektu/>
+    DocumentRoot /ścieżka/do/projektu/public
+    <Directory /ścieżka/do/projektu/public>
         AllowOverride All
         Require all granted
     </Directory>

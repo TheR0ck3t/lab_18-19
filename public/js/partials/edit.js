@@ -1,5 +1,11 @@
+/**
+ * Funkcja obsługująca edycję istniejącego elementu (formularza, szablonu lub pola)
+ * @param {string} type - Typ zasobu do edycji: forms, templates lub fields
+ * @param {number} id - Identyfikator zasobu do edycji
+ */
 async function editPartial(type, id) {
     try {
+        // Pobieranie danych zasobu do edycji
         const response = await fetch(`./api/load?type=${type}&id=${id}`);
         if (!response.ok) {
           throw new Error("Błąd podczas pobierania danych.");
@@ -12,6 +18,7 @@ async function editPartial(type, id) {
         const editor = document.getElementById("editor")
         switch (type) {
           case "forms":
+            // Generowanie interfejsu edycji formularza
             editor.innerHTML = `
               <h2>Edytuj formularz</h2>
               <h3>Stara nazwa formularza: <span id="name">${data.form_name}</span></h3>
@@ -24,6 +31,7 @@ async function editPartial(type, id) {
               <button id="cancelButton">Anuluj</button>
             `;
 
+            // Pobieranie dostępnych pól
             fetch(`./api/list?type=fields`)
               .then(response => {
                 if (!response.ok) throw new Error("Nie udało się pobrać danych.");
@@ -34,6 +42,7 @@ async function editPartial(type, id) {
                 const fieldsContainer = document.getElementById("fieldsContainer");
                 const addFieldButton = document.getElementById("addFieldButton");
 
+                // Przygotowanie tablicy wybranych pól
                 let selectedFields = [];
                 try {
                   selectedFields = Array.isArray(data.data)
@@ -144,6 +153,7 @@ async function editPartial(type, id) {
                 // Wykonaj pierwsze uaktualnienie, aby zablokować już wybrane opcje
                 updateAllSelects();
 
+                // Obsługa przycisku dodawania nowego pola
                 addFieldButton.addEventListener("click", () => {
                   const selectsCount = fieldsContainer.querySelectorAll("select").length;
                   if (selectsCount >= fields.length) {
@@ -164,6 +174,7 @@ async function editPartial(type, id) {
               });
             break;
           case "templates":
+            // Generowanie interfejsu edycji szablonu
             editor.innerHTML = `
               <h2>Edytuj szablon</h2>
               <h3>Stara nazwa formularza: <span id="name">${data.template_name}</span></h3>
@@ -177,6 +188,7 @@ async function editPartial(type, id) {
               <button id="saveButton">Zapisz</button>
               <button id="cancelButton">Anuluj</button>
             `;
+            // Pobieranie dostępnych pól do użycia w szablonie
             fetch(`./api/list?type=fields`)
         .then(response => {
             if (!response.ok) throw new Error("Nie udało się pobrać danych.");
@@ -186,6 +198,7 @@ async function editPartial(type, id) {
             if (!data) throw new Error("Nie znaleziono danych.");
             const fields = Array.isArray(data) && Array.isArray(data[0]) ? data[0] : data;
             const availableFieldsContainer = document.getElementById("availableFieldsContainer");
+            // Tworzenie przycisków do wstawiania pól w szablonie
             fields.forEach(field => {
                 const addFieldButton = document.createElement("button");
                 addFieldButton.textContent = `Dodaj ${field.field_name}`;
@@ -208,6 +221,7 @@ async function editPartial(type, id) {
         });
             break;
           case "fields":
+            // Generowanie interfejsu edycji pola
             editor.innerHTML = `
               <h2>Edytuj pole</h2>
               <h3 id="name">Stara nazwa pola: ${data.field_name}</h3>
@@ -224,15 +238,19 @@ async function editPartial(type, id) {
         document.getElementById("editor").textContent = "Nie udało się wczytać danych.";
       }
     
+      // Dodanie obsługi przycisków Zapisz i Anuluj
       const saveButton = document.getElementById("saveButton");
       const cancelButton = document.getElementById("cancelButton");
       saveButton.addEventListener("click", async function () {
+        // Pobranie wartości z pól formularza
         const content = document.getElementById("content") ? document.getElementById("content").value : null;
         let name = document.getElementById("name").textContent;
         const newName = document.getElementById("newName") ? document.getElementById("newName").value : null;
         if (newName !== "") {
           name = newName;
         }
+        
+        // Przygotowanie danych do wysłania w zależności od typu
         const payload = {};
         switch (type) {
           case "forms":
@@ -253,6 +271,8 @@ async function editPartial(type, id) {
             console.error("Nieznany typ.");
             return;
         }
+        
+        // Walidacja danych
         if (!content && type !== "forms") {
           alert("Nie można zapisać pustego szablonu.");
           return;
@@ -269,7 +289,9 @@ async function editPartial(type, id) {
           alert("Nie można zaktualizować pustego pola.");
           return;
         }
+        
         try {
+          // Wysłanie danych do API
           const response = await fetch(`./api/update?type=${type}&id=${id}`, {
             method: "PUT",
             headers: {
@@ -290,6 +312,8 @@ async function editPartial(type, id) {
           alert(`Nie udało się zapisać danych. Szczegóły: ${error.message}`);
         }
       });
+      
+      // Obsługa przycisku Anuluj
       cancelButton.addEventListener("click", function () {
         window.location.href = `./`;
       });

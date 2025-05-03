@@ -1,9 +1,15 @@
+/**
+ * Funkcja obsługująca tworzenie nowego elementu (formularza, szablonu lub pola)
+ * @param {string} type - Typ zasobu do utworzenia: forms, templates lub fields
+ */
 async function newPartial(type) {
-
+    // Sprawdzenie czy podano typ
     if (!type) {
         console.error("Nie podano typu.");
         return;
     }
+    
+    // Wybór odpowiedniej funkcji w zależności od typu
     switch (type) {
         case "forms": {
             document.getElementById("header").innerHTML += " - Nowy formularz";
@@ -25,11 +31,13 @@ async function newPartial(type) {
             return;
         }
     }
-
 }
 
-
+/**
+ * Funkcja tworząca interfejs do dodawania nowego formularza
+ */
 function createForm() {
+    // Dodanie HTML do edytora
     document.getElementById("editor").innerHTML = `
         <input type="text" id="name" placeholder="Nazwa formularza" required/>
         <h3>Dostępne pola</h3>
@@ -42,6 +50,7 @@ function createForm() {
     const cancelButton = document.getElementById("cancelButton");
     const fieldsContainer = document.getElementById("fieldsContainer");
 
+    // Pobieranie listy dostępnych pól
     fetch(`./api/list?type=fields`)
         .then(response => {
             if (!response.ok) throw new Error("Nie udało się pobrać danych.");
@@ -75,6 +84,7 @@ function createForm() {
 
                 const selected = getSelectedFieldNames();
 
+                // Dodawanie opcji dla pól
                 fields.forEach(field => {
                     // Pozwól wybrać tylko nieużyte pole lub aktualnie wybrane
                     if (selected.includes(field.field_name) && field.field_name !== selectedValue) return;
@@ -110,6 +120,7 @@ function createForm() {
                     while (select.options.length > 1) {
                         select.remove(1);
                     }
+                    // Dodaj tylko opcje, które nie są wybrane gdzie indziej
                     fields.forEach(field => {
                         if (selected.includes(field.field_name) && field.field_name !== currentValue) return;
                         const option = document.createElement("option");
@@ -148,25 +159,33 @@ function createForm() {
             document.getElementById("editor").textContent = "Nie udało się wczytać danych.";
         });
 
+    // Obsługa przycisku zapisywania
     saveButton.addEventListener("click", async function () {
         const name = document.getElementById("name").value;
         const selectedFields = Array.from(fieldsContainer.querySelectorAll("select"))
             .map(select => select.value)
             .filter(value => value);
+            
         // Walidacja unikalności pól
         if (new Set(selectedFields).size !== selectedFields.length) {
             alert("Każde pole może być wybrane tylko raz.");
             return;
         }
+        
+        // Przygotowanie danych do wysłania
         const payload = {
             form_name: name,
             data: selectedFields,
         };
+        
+        // Walidacja nazwy
         if (!name) {
             alert("Nie można zapisać pustego pola.");
             return;
         }
+        
         try {
+            // Wysłanie danych do API
             const response = await fetch(`./api/create?type=forms`, {
                 method: "POST",
                 headers: {
@@ -188,12 +207,17 @@ function createForm() {
         }
     });
 
+    // Obsługa przycisku anulowania
     cancelButton.addEventListener("click", function () {
         window.location.href = `./`;
     });
 }
 
+/**
+ * Funkcja tworząca interfejs do dodawania nowego szablonu
+ */
 function createTemplate() {
+    // Dodanie HTML do edytora
     document.getElementById("editor").innerHTML = `
           <input type="text" id="name" placeholder="Nazwa szablonu" required/>
           <div id="availableFields">
@@ -204,6 +228,8 @@ function createTemplate() {
           <button id="saveButton">Utwórz</button>
           <button id="cancelButton">Anuluj</button>
         `;
+        
+    // Pobieranie listy dostępnych pól
     fetch(`./api/list?type=fields`)
         .then(response => {
             if (!response.ok) throw new Error("Nie udało się pobrać danych.");
@@ -213,10 +239,13 @@ function createTemplate() {
             if (!data) throw new Error("Nie znaleziono danych.");
             const fields = Array.isArray(data) && Array.isArray(data[0]) ? data[0] : data;
             const availableFieldsContainer = document.getElementById("availableFieldsContainer");
+            
+            // Tworzenie przycisków do wstawiania pól w szablonie
             fields.forEach(field => {
                 const addFieldButton = document.createElement("button");
                 addFieldButton.textContent = `Dodaj ${field.field_name}`;
                 addFieldButton.type = "button";
+                // Obsługa wstawiania pola do tekstu szablonu
                 addFieldButton.addEventListener("click", function () {
                     const templateContent = document.getElementById("templateContent");
                     const cursorPos = templateContent.selectionStart;
@@ -233,8 +262,12 @@ function createTemplate() {
             console.error("Błąd:", error);
             document.getElementById("editor").textContent = "Nie udało się wczytać danych.";
         });
+        
+        // Obsługa przycisków
         const saveButton = document.getElementById("saveButton");
         const cancelButton = document.getElementById("cancelButton");
+        
+        // Obsługa przycisku zapisywania
         saveButton.addEventListener("click", async function () {
             const content = document.getElementById("templateContent").value;
             const name = document.getElementById("name").value;
@@ -243,6 +276,8 @@ function createTemplate() {
                 template_name: name
             };
             console.log(payload);
+            
+            // Walidacja danych
             if (!name) {
                 alert("Nie można zapisać pustego pola.");
                 return;
@@ -251,7 +286,9 @@ function createTemplate() {
                 alert("Nie można zapisać pustego szablonu.");
                 return;
             }
+            
             try {
+                // Wysłanie danych do API
                 const response = await fetch(`./api/create?type=templates`, {
                     method: "POST",
                     headers: {
@@ -272,13 +309,18 @@ function createTemplate() {
                 alert(`Nie udało się zapisać danych. Szczegóły: ${error.message}`);
             }
         });
+        
+        // Obsługa przycisku anulowania
         cancelButton.addEventListener("click", function () {
             window.location.href = `./`;
         });
 }
 
-
+/**
+ * Funkcja tworząca interfejs do dodawania nowych pól
+ */
 function addNewField() {
+    // Dodanie HTML do edytora
     document.getElementById("editor").innerHTML = `
           <div id="fields">
           <input type="text" class="name" placeholder="Nazwa pola" required/>
@@ -287,8 +329,11 @@ function addNewField() {
           <button id="saveButton">Utwórz</button>
           <button id="cancelButton">Anuluj</button>
         `;
+        
     const fieldsContainer = document.getElementById("fields");
     const addFieldButton = document.getElementById("addFieldButton");
+    
+    // Obsługa przycisku dodawania kolejnego pola
     addFieldButton.addEventListener("click", function () {
         const newField = document.createElement("input");
         newField.type = "text";
@@ -297,11 +342,17 @@ function addNewField() {
         newField.required = true;
         fieldsContainer.appendChild(newField);
     });
+    
     const saveButton = document.getElementById("saveButton");
     const cancelButton = document.getElementById("cancelButton");
+    
+    // Obsługa przycisku zapisywania
     saveButton.addEventListener("click", async function () {
+        // Zebranie wszystkich nazw pól
         const allInputs = document.querySelectorAll(".name");
         const fieldNames = Array.from(allInputs).map(field => field.value.trim());
+        
+        // Walidacja danych
         if (fieldNames.length === 0) {
             alert("Dodaj przynajmniej jedno pole.");
             return;
@@ -310,11 +361,15 @@ function addNewField() {
             alert("Nie można zapisać pustego pola.");
             return;
         }
+        
+        // Przygotowanie danych do wysłania
         const payload = {
             field_name: fieldNames
         };
         console.log(payload);
+        
         try {
+            // Wysłanie danych do API
             const response = await fetch(`./api/create?type=fields`, {
                 method: "POST",
                 headers: {
@@ -335,6 +390,8 @@ function addNewField() {
             alert(`Nie udało się zapisać danych. Szczegóły: ${error.message}`);
         }
     });
+    
+    // Obsługa przycisku anulowania
     cancelButton.addEventListener("click", function () {
         window.location.href = `./`;
     });
