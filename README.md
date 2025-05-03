@@ -92,12 +92,22 @@ cd /var/www/html/
 # Opcja B: Użyj komendy git jeśli jest zainstalowany
 git clone https://github.com/TheR0ck3t/lab_18-19.git
 
-# Krok 3: Nadaj wymagane uprawnienia (tylko Linux)
+# Krok 3: Włączenie rozszerzenia SQLite3 w PHP
+# W systemie Windows (XAMPP):
+# - Otwórz C:\xampp\php\php.ini w notatniku
+# - Znajdź linię ";extension=sqlite3" i usuń średnik z początku
+# - Zapisz plik i uruchom ponownie serwer Apache
+
+# W systemie Linux:
+sudo apt-get install php-sqlite3
+sudo systemctl restart apache2
+
+# Krok 4: Nadaj wymagane uprawnienia (tylko Linux)
 # W systemie Windows ten krok możesz pominąć
 sudo chmod -R 755 lab_18-19/
 sudo chmod -R 777 lab_18-19/db/ lab_18-19/media/
 
-# Krok 4: Otwórz projekt w przeglądarce
+# Krok 5: Otwórz projekt w przeglądarce
 # http://localhost/lab_18-19/
 ```
 
@@ -112,11 +122,29 @@ cd lab_18-19
 php -v
 php -m | grep sqlite
 
-# Krok 3: Skonfiguruj uprawnienia dla plików danych
+# Jeśli SQLite3 nie jest zainstalowany:
+# Na Debian/Ubuntu:
+sudo apt-get install php-sqlite3
+
+# Na CentOS/RHEL:
+sudo yum install php-sqlite3
+
+# Na macOS z Homebrew:
+brew install php
+
+# Krok 3: Sprawdź i edytuj php.ini jeśli potrzeba
+# Znajdź lokalizację php.ini
+php --ini
+
+# Edytuj php.ini i odkomentuj lub dodaj linię:
+# extension=sqlite3
+# Następnie zrestartuj serwer
+
+# Krok 4: Skonfiguruj uprawnienia dla plików danych
 chmod -R 755 .
 chmod -R 777 db/ media/
 
-# Krok 4: Dostosuj config.php według potrzeb (opcjonalnie)
+# Krok 5: Dostosuj config.php według potrzeb (opcjonalnie)
 ```
 
 ## Uruchomienie
@@ -153,7 +181,6 @@ php -S 0.0.0.0:8000 -t /
 
 # Pamiętaj, aby dodać wpis w pliku hosts:
 # 127.0.0.1 lab_18-19.local
-
 ```
 
 ## Wymagania systemowe
